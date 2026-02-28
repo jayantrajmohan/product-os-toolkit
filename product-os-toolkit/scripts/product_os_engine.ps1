@@ -15,7 +15,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$EngineVersion = "2.0.0"
+$EngineVersion = "2.1.0"
 
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   throw "RepoRoot is required. Use generated wrappers (scripts/product_os.cmd or scripts/product_os.sh) or pass -RepoRoot explicitly."
@@ -73,6 +73,7 @@ $LearningReview = Join-Path $InitiativeReports "learning-review.md"
 $IterationBacklog = Join-Path $InitiativeReports "iteration-backlog.md"
 $DecisionLog = Join-Path $InitiativeLogs "decisions.md"
 $PortfolioStatusPM = Join-Path $Reports "pm-portfolio-dashboard.md"
+$CandidateRegistry = Join-Path $Reports "initiative-candidates.csv"
 $CurrentState = Join-Path $InitiativeContext "current-state.md"
 $ChangeLog = Join-Path $InitiativeContext "change-log.md"
 $SessionBrief = Join-Path $InitiativeContext "session-brief.md"
@@ -463,6 +464,71 @@ feedback_id,initiative_id,source_id,source_record_id,captured_at,ingested_at,cha
   }
 }
 
+function Write-DefaultCandidateRegistry {
+  if (-not (Test-Path $CandidateRegistry)) {
+@"
+candidate_id,source_feedback_id,proposed_initiative_id,initiative_type,theme,severity,problem_statement,evidence_link,status
+"@ | Set-Content -Path $CandidateRegistry -Encoding ascii
+  }
+}
+
+function Normalize-TriageStatus {
+  param([string]$Value,[string]$InitiativeId = "")
+  $v = ([string]$Value).Trim().ToLowerInvariant()
+  if ($v -eq "duplicate") { return "Duplicate" }
+  if ($v -eq "ignored") { return "Ignored" }
+  if ($v -eq "mapped") { return "Mapped" }
+  if ($v -eq "candidate") { return "Candidate" }
+  if ($v -eq "promoted") { return "Promoted" }
+  $id = (([string]$InitiativeId).Trim().ToLowerInvariant())
+  if ([string]::IsNullOrWhiteSpace($id) -or $id -eq "unassigned" -or $id -eq "global") { return "Candidate" }
+  return "Mapped"
+}
+
+function Normalize-InitiativeType {
+  param([string]$Value)
+  $v = ([string]$Value).Trim().ToLowerInvariant()
+  if ($v -in @("bug","bug_fix","bugfix","defect")) { return "bug_fix" }
+  if ($v -in @("new","new_feature","feature","new feature")) { return "new_feature" }
+  if ($v -in @("ops","ops_improvement","operations")) { return "ops_improvement" }
+  if ($v -in @("research","discovery")) { return "research" }
+  return "enhancement"
+}
+
+function Infer-InitiativeTypeFromText {
+  param([string]$Text)
+  $t = ([string]$Text).ToLowerInvariant()
+  if ($t -match "bug|error|crash|broken|fail|failed|cannot|can't|issue|defect|regression") { return "bug_fix" }
+  if ($t -match "new feature|new capability|build new|from scratch|greenfield") { return "new_feature" }
+  if ($t -match "research|explore|spike|unknown") { return "research" }
+  if ($t -match "ops|process|workflow|automation|reporting cadence") { return "ops_improvement" }
+  return "enhancement"
+}
+
+function Get-ExistingInitiativeIds {
+  $dirs = Get-ChildItem -Path $InitiativesRoot -Directory -ErrorAction SilentlyContinue
+  return @($dirs | ForEach-Object { $_.Name } | Where-Object { $_ -ne "global" -and $_ -ne "unassigned" })
+}
+
+function Resolve-InitiativeMapping {
+  param([string]$ProposedId,[string]$ProblemText)
+  $normalized = (([string]$ProposedId).Trim().ToLowerInvariant())
+  $normalized = ($normalized -replace "[^a-z0-9\-_.]", "-")
+  if (-not [string]::IsNullOrWhiteSpace($normalized) -and $normalized -ne "global" -and $normalized -ne "unassigned") {
+    return [pscustomobject]@{ initiative_id = $normalized; triage_status = "Mapped" }
+  }
+  $existing = Get-ExistingInitiativeIds
+  $txt = ([string]$ProblemText).ToLowerInvariant()
+  foreach ($id in $existing) {
+    $idLow = $id.ToLowerInvariant()
+    $idSpaced = ($idLow -replace "[-_.]", " ")
+    if ($txt -match [regex]::Escape($idLow) -or $txt -match [regex]::Escape($idSpaced)) {
+      return [pscustomobject]@{ initiative_id = $id; triage_status = "Mapped" }
+    }
+  }
+  return [pscustomobject]@{ initiative_id = "unassigned"; triage_status = "Candidate" }
+}
+
 function Backfill-InitiativeIds {
   if (-not (Test-Path $Registry)) { return }
   $rows = Import-Csv -Path $Registry
@@ -475,6 +541,14 @@ function Backfill-InitiativeIds {
       $changed = $true
     } elseif ([string]$r.initiative_id -ne $normalized) {
       $r.initiative_id = $normalized
+      $changed = $true
+    }
+    $status = Normalize-TriageStatus -Value ([string]$r.triage_status) -InitiativeId $normalized
+    if ($null -eq $r.PSObject.Properties["triage_status"]) {
+      $r | Add-Member -MemberType NoteProperty -Name triage_status -Value $status -Force
+      $changed = $true
+    } elseif ([string]$r.triage_status -ne $status) {
+      $r.triage_status = $status
       $changed = $true
     }
   }
@@ -631,9 +705,12 @@ function Ingest-RawFeedback {
       $initiativeId = Get-FieldValue -Row $row -Candidates @("initiative_id","initiative","requirement_id")
       if ([string]::IsNullOrWhiteSpace($initiativeId)) { $initiativeId = ($f.BaseName -replace "[^a-zA-Z0-9\-_.]", "-").ToLowerInvariant() }
       if ([string]::IsNullOrWhiteSpace($initiativeId)) { $initiativeId = "unassigned" }
-      if ($InitiativeKey -ne "global" -and $initiativeId -ne $InitiativeKey) { continue }
       $problem = Get-FieldValue -Row $row -Candidates @("problem_statement","feedback","message","text","summary")
       if ([string]::IsNullOrWhiteSpace($problem)) { continue }
+      $mapped = Resolve-InitiativeMapping -ProposedId $initiativeId -ProblemText $problem
+      $initiativeId = [string]$mapped.initiative_id
+      $triageStatus = [string]$mapped.triage_status
+      if ($InitiativeKey -ne "global" -and $initiativeId -ne $InitiativeKey) { continue }
       $channel = Get-FieldValue -Row $row -Candidates @("channel","source","source_channel")
       if ([string]::IsNullOrWhiteSpace($channel)) { $channel = $f.Directory.Name }
       $sourceRec = Get-FieldValue -Row $row -Candidates @("source_record_id","id","message_id","ticket_id")
@@ -664,7 +741,7 @@ function Ingest-RawFeedback {
         problem_statement = $problem
         evidence_link = (Get-FieldValue -Row $row -Candidates @("evidence_link","url","link"))
         dedupe_key = $dedupe
-        triage_status = "New"
+        triage_status = $triageStatus
       }
       if ([string]::IsNullOrWhiteSpace([string]$obj.captured_at)) { $obj.captured_at = (Get-Date -Format o) }
       if ([string]::IsNullOrWhiteSpace([string]$obj.evidence_link)) { $obj.evidence_link = $f.FullName }
@@ -677,6 +754,47 @@ function Ingest-RawFeedback {
       Export-Csv -Path $Registry -NoTypeInformation -Encoding ascii
   }
   return $added
+}
+
+function Build-InitiativeCandidates {
+  Write-DefaultCandidateRegistry
+  if (-not (Test-Path $Registry)) { return 0 }
+  $rows = Import-Csv -Path $Registry
+  if ($rows.Count -eq 0) {
+@"
+candidate_id,source_feedback_id,proposed_initiative_id,initiative_type,theme,severity,problem_statement,evidence_link,status
+"@ | Set-Content -Path $CandidateRegistry -Encoding ascii
+    return 0
+  }
+  $scoped = @($rows | Where-Object {
+    $status = Normalize-TriageStatus -Value ([string]$_.triage_status) -InitiativeId (Get-NormalizedInitiativeId -Row $_)
+    if ($status -ne "Candidate") { return $false }
+    if ($InitiativeKey -eq "global") { return $true }
+    $rid = Get-NormalizedInitiativeId -Row $_
+    return ($rid -eq $InitiativeKey -or $rid -eq "unassigned")
+  })
+  $out = @()
+  $i = 0
+  foreach ($r in $scoped) {
+    $i++
+    $theme = if ([string]::IsNullOrWhiteSpace([string]$r.theme)) { "general" } else { ([string]$r.theme).Trim().ToLowerInvariant() }
+    $theme = ($theme -replace "[^a-z0-9\-_.]", "-")
+    if ([string]::IsNullOrWhiteSpace($theme)) { $theme = "general" }
+    $proposed = ("cand-" + $theme + "-" + $i.ToString("000"))
+    $out += [pscustomobject]@{
+      candidate_id = ("CAND-" + $i.ToString("000"))
+      source_feedback_id = [string]$r.feedback_id
+      proposed_initiative_id = $proposed
+      initiative_type = (Infer-InitiativeTypeFromText -Text ([string]$r.problem_statement))
+      theme = [string]$r.theme
+      severity = [string]$r.severity
+      problem_statement = [string]$r.problem_statement
+      evidence_link = [string]$r.evidence_link
+      status = "Candidate"
+    }
+  }
+  $out | Export-Csv -Path $CandidateRegistry -NoTypeInformation -Encoding ascii
+  return $out.Count
 }
 
 function Sync-RegistryExcel {
@@ -765,6 +883,47 @@ function Ensure-Artifact {
 
 function Render-StageArtifacts {
   param([string]$StageName)
+  if ($StageName -eq "discover") {
+    Ensure-Artifact -Path $Insights -DefaultContent @(
+      "# Insights Summary",
+      "- initiative_scope: $InitiativeKey",
+      "- rows: 0",
+      "",
+      "## Theme Counts",
+      "-",
+      "",
+      "## Severity Counts",
+      "-"
+    )
+    Ensure-Artifact -Path $InsightsPM -DefaultContent @(
+      "# Discovery Insights",
+      "Status: Draft",
+      "Initiative: $InitiativeKey",
+      "",
+      "## Key Signals",
+      "-",
+      "",
+      "## Themes",
+      "-",
+      "",
+      "## Evidence",
+      "-"
+    )
+    Ensure-Artifact -Path $DiscoveryBrief -DefaultContent @(
+      "# Discovery Brief",
+      "Status: Draft",
+      "Initiative: $InitiativeKey",
+      "",
+      "## Problem Framing",
+      "-",
+      "",
+      "## Sources Reviewed",
+      "-",
+      "",
+      "## Top Insights",
+      "-"
+    )
+  }
   if ($StageName -eq "define") {
     Ensure-Artifact -Path $DefinePRD -DefaultContent @("# PRD","Status: Draft","Initiative: $InitiativeKey","","## Problem","","## Users","","## Success Metrics","","## Requirements","- R1:")
     Ensure-Artifact -Path $DefinePRDPM -DefaultContent @("# Requirements PRD","Status: Draft","Initiative: $InitiativeKey","","## Problem","","## Users","","## Success Metrics","","## Requirements","- R1:")
@@ -915,15 +1074,18 @@ Ensure-Path -Path $InitiativeLogs
 Ensure-Path -Path $InitiativeContext
 
 Write-DefaultRegistry
+Write-DefaultCandidateRegistry
 Backfill-InitiativeIds
 Check-VersionCompatibility
 
 switch ($Action) {
   "init" {
+    Render-StageArtifacts -StageName "discover"
     Render-StageArtifacts -StageName "define"
     Render-StageArtifacts -StageName "build_ready"
     Render-StageArtifacts -StageName "release_ready"
     Render-StageArtifacts -StageName "learn_ready"
+    [void](Build-InitiativeCandidates)
     Refresh-InitiativeContext
     Rebuild-SessionRegister
     Build-DayPlan
@@ -940,24 +1102,12 @@ switch ($Action) {
         $preExtracted = Preprocess-UnstructuredSources
         $added = Ingest-RawFeedback
         Build-Insights
-        Ensure-Artifact -Path $DiscoveryBrief -DefaultContent @(
-          "# Discovery Brief",
-          "Status: Draft",
-          "Initiative: $InitiativeKey",
-          "",
-          "## Problem Framing",
-          "-",
-          "",
-          "## Sources Reviewed",
-          "-",
-          "",
-          "## Top Insights",
-          "-"
-        )
+        Render-StageArtifacts -StageName "discover"
+        $candidateCount = Build-InitiativeCandidates
         $excelSynced = Sync-RegistryExcel
         Build-AgentPack -StageName "discover"
         Refresh-InitiativeContext
-        Write-Output "Stage discover complete. extracted=$preExtracted added=$added excel_sync=$excelSynced"
+        Write-Output "Stage discover complete. extracted=$preExtracted added=$added candidates=$candidateCount excel_sync=$excelSynced"
       }
       "prioritize" {
         if (-not (Is-StageApproved -StageName "discover")) { throw "Stage discover is not approved." }

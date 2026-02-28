@@ -20,6 +20,8 @@ Required stage outputs:
   - `reports/discovery-brief.md`
 - Workspace-scoped:
   - `normalized/feedback_registry.csv`
+  - `reports/initiative-candidates.csv`
+  - Registry triage states must use: `Mapped`, `Candidate`, `Duplicate`, `Ignored`, `Promoted`.
 
 1. `prioritize`
 - `reports/prioritization-matrix.csv` (compat alias: `prioritization.csv`)

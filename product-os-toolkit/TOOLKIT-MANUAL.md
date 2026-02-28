@@ -1,6 +1,6 @@
 # Product OS Toolkit Manual
 
-Version: `1.0.0` (see `VERSION` and `CHANGELOG.md`).
+Version: `1.1.0` (see `VERSION` and `CHANGELOG.md`).
 
 ## 1. Purpose
 
@@ -107,6 +107,12 @@ Per initiative:
 1. `runstage learning <initiative>`
 1. `approvestage learning <initiative>`
 
+Initiative start behavior:
+
+- `init <initiative_id>` creates starter discovery docs automatically:
+  - `reports/discovery-brief.md`
+  - `reports/discovery-insights.md`
+
 Optional gates:
 
 - `approve G1` after delivery_ready
@@ -148,6 +154,17 @@ Logs/agent:
 - `logs/decisions.md`
 - `agent-packs/<stage>/task.md`
 - `agent-packs/<stage>/context.json`
+
+Workspace intake artifacts:
+
+- `normalized/feedback_registry.csv`
+- `reports/initiative-candidates.csv`
+- `triage_status` values in registry:
+  - `Mapped` (linked to an existing initiative)
+  - `Candidate` (needs PM promotion decision)
+  - `Duplicate`
+  - `Ignored`
+  - `Promoted`
 
 ## 7. Daily Operating System
 

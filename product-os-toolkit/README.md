@@ -4,7 +4,7 @@ Portable Product OS for AI-enabled PMs using Codex, Claude Code, or generic LLM 
 
 Read [TOOLKIT-MANUAL.md](./TOOLKIT-MANUAL.md) for full end-to-end documentation.
 For session-by-session operation, use the "Session Run Playbook" section in the manual.
-Current version: `1.0.0` (see [VERSION](./VERSION) and [CHANGELOG.md](./CHANGELOG.md)).
+Current version: `1.1.0` (see [VERSION](./VERSION) and [CHANGELOG.md](./CHANGELOG.md)).
 
 ## Included
 - `scripts/product_os_engine.ps1`: stage orchestrator, approvals, validation, agent-pack generation.
@@ -59,6 +59,7 @@ Note: direct engine execution requires `-RepoRoot`; wrappers pass this automatic
 - `product-intel/reports/portfolio-status.md`
 - `product-intel/reports/pm-portfolio-dashboard.md`
 - `product-intel/reports/initiative-index.md`
+- `product-intel/reports/initiative-candidates.csv`
 - `product-intel/daily/today-plan.md`
 - `product-intel/daily/session-register.md`
 - `product-intel/daily/end-of-day-rollup.md`

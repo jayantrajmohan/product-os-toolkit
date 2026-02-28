@@ -2,6 +2,24 @@
 
 All notable changes to Product OS Toolkit are documented in this file.
 
+## [1.1.0] - 2026-02-28
+
+Intake and initiative-start reliability update.
+
+### Added
+- Automatic candidate backlog file:
+  - `product-intel/reports/initiative-candidates.csv`
+- Discovery starter artifact creation on initiative init:
+  - `reports/discovery-brief.md`
+  - `reports/discovery-insights.md`
+- Feedback triage normalization for raw intake with explicit states:
+  - `Mapped`, `Candidate`, `Duplicate`, `Ignored`, `Promoted`
+
+### Changed
+- Discovery stage now rebuilds candidate backlog after ingestion.
+- Ingestion maps feedback to existing initiatives when initiative ID or initiative-name text signals are present.
+- Engine version updated to `2.1.0`.
+
 ## [1.0.0] - 2026-02-28
 
 Initial ship-ready baseline for portable AI-enabled PM operations.
@@ -32,4 +50,3 @@ Initial ship-ready baseline for portable AI-enabled PM operations.
 
 ### Notes
 - Compatibility aliases are intentionally retained for migration safety.
-
