@@ -836,8 +836,18 @@ function Build-Insights {
 function Build-Prioritization {
   $rows = Get-ScopedRows -Rows (Import-Csv -Path $Registry)
   if ($rows.Count -eq 0) {
-    @() | Export-Csv -Path $Prioritization -NoTypeInformation -Encoding ascii
-    @() | Export-Csv -Path $PrioritizationPM -NoTypeInformation -Encoding ascii
+    $hasExisting = $false
+    if (Test-Path $Prioritization) {
+      $existing = Import-Csv -Path $Prioritization -ErrorAction SilentlyContinue
+      if ($existing -and $existing.Count -gt 0) {
+        $existing | Export-Csv -Path $PrioritizationPM -NoTypeInformation -Encoding ascii
+        $hasExisting = $true
+      }
+    }
+    if (-not $hasExisting) {
+      @() | Export-Csv -Path $Prioritization -NoTypeInformation -Encoding ascii
+      @() | Export-Csv -Path $PrioritizationPM -NoTypeInformation -Encoding ascii
+    }
     return
   }
   if ($InitiativeKey -eq "global") {
