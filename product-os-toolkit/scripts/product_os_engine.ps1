@@ -74,6 +74,7 @@ $IterationBacklog = Join-Path $InitiativeReports "iteration-backlog.md"
 $DecisionLog = Join-Path $InitiativeLogs "decisions.md"
 $PortfolioStatusPM = Join-Path $Reports "pm-portfolio-dashboard.md"
 $CandidateRegistry = Join-Path $Reports "initiative-candidates.csv"
+$ReportNavigator = Join-Path $InitiativeReports "README.md"
 $CurrentState = Join-Path $InitiativeContext "current-state.md"
 $ChangeLog = Join-Path $InitiativeContext "change-log.md"
 $SessionBrief = Join-Path $InitiativeContext "session-brief.md"
@@ -362,6 +363,43 @@ function Build-DayPlan {
     $out += "No active initiatives found."
   }
   Write-TextFileSafe -Path $DailyToday -Lines $out
+}
+
+function Refresh-ReportNavigator {
+  Ensure-Path -Path $InitiativeReports
+  $stage = Get-NextStageLabel
+  $lines = @(
+    "# Initiative Reports",
+    "- initiative_id: $InitiativeKey",
+    "- updated_at: $(Get-Date -Format o)",
+    "- active_stage: $stage",
+    "",
+    "## Discovery",
+    "- [discovery-brief.md](./discovery-brief.md)",
+    "- [discovery-insights.md](./discovery-insights.md)",
+    "",
+    "## Prioritization",
+    "- [prioritization-matrix.csv](./prioritization-matrix.csv)",
+    "- [roadmap-plan.md](./roadmap-plan.md)",
+    "- [prioritization-decision-log.md](./prioritization-decision-log.md)",
+    "",
+    "## Definition",
+    "- [requirements-prd.md](./requirements-prd.md)",
+    "- [execution-plan.md](./execution-plan.md)",
+    "",
+    "## Delivery Readiness",
+    "- [delivery-readiness.md](./delivery-readiness.md)",
+    "- [test-case-mapping.md](./test-case-mapping.md)",
+    "",
+    "## Launch Readiness",
+    "- [launch-readiness.md](./launch-readiness.md)",
+    "- [release-checklist.md](./release-checklist.md)",
+    "",
+    "## Learning",
+    "- [learning-review.md](./learning-review.md)",
+    "- [iteration-backlog.md](./iteration-backlog.md)"
+  )
+  Write-TextFileSafe -Path $ReportNavigator -Lines $lines
 }
 
 function Ensure-Path { param([string]$Path) if (-not (Test-Path $Path)) { New-Item -ItemType Directory -Force -Path $Path | Out-Null } }
@@ -1101,6 +1139,7 @@ switch ($Action) {
     Render-StageArtifacts -StageName "learn_ready"
     [void](Build-InitiativeCandidates)
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Rebuild-SessionRegister
     Build-DayPlan
     Update-PortfolioStatus
@@ -1203,6 +1242,7 @@ switch ($Action) {
         Write-Output "Stage learn_ready prepared."
       }
     }
+    Refresh-ReportNavigator
     Build-DayPlan
     Update-PortfolioStatus
     Update-InitiativeIndex
@@ -1251,6 +1291,7 @@ switch ($Action) {
     }
     Write-ApprovalFile -Path (Stage-File -StageName $Stage)
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Build-DayPlan
     Update-PortfolioStatus
     Update-InitiativeIndex
@@ -1264,6 +1305,7 @@ switch ($Action) {
     if ($Gate -eq "G3" -and -not (Is-StageApproved -StageName "learn_ready")) { throw "G3 requires learn_ready approval." }
     Write-ApprovalFile -Path (Gate-File -GateName $Gate)
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Build-DayPlan
     Update-PortfolioStatus
     Update-InitiativeIndex
@@ -1277,6 +1319,7 @@ switch ($Action) {
     Build-Prioritization
     Build-RoadmapProposal
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Build-DayPlan
     Update-PortfolioStatus
     Update-InitiativeIndex
@@ -1358,9 +1401,11 @@ switch ($Action) {
     $ChangeLog = Join-Path $InitiativeContext "change-log.md"
     $SessionBrief = Join-Path $InitiativeContext "session-brief.md"
     $InitiativeMeta = Join-Path $InitiativeContext "initiative-meta.md"
+    $ReportNavigator = Join-Path $InitiativeReports "README.md"
     Ensure-Path -Path $InitiativeContext
     Append-ChangeLog -SessionId $Session -StageName ($meta.stage + "") -Summary $summary
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Rebuild-SessionRegister
     Build-DayPlan
     Write-Output "Session closed: $Session"
@@ -1393,6 +1438,7 @@ switch ($Action) {
   }
   "status" {
     Refresh-InitiativeContext
+    Refresh-ReportNavigator
     Rebuild-SessionRegister
     Build-DayPlan
     Update-PortfolioStatus

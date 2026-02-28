@@ -2,6 +2,15 @@
 
 All notable changes to Product OS Toolkit are documented in this file.
 
+## [1.2.1] - 2026-02-28
+
+Reports navigation usability patch.
+
+### Added
+- Initiative reports index now renders clickable markdown links in:
+  - `product-intel/initiatives/<initiative_id>/reports/README.md`
+- Index refresh is wired into standard workflow actions (`init`, `runstage`, `approvestage`, `approve`, `run`, `status`, `closesession`).
+
 ## [1.2.0] - 2026-02-28
 
 Canonical single-artifact mode by stage.
@@ -23,7 +32,7 @@ Prioritization data preservation patch.
 
 ### Fixed
 - When scoped registry rows are zero, `runstage prioritization` no longer overwrites non-empty prioritization outputs.
-- Existing non-empty `reports/prioritization.csv` is preserved and mirrored to `reports/prioritization-matrix.csv`.
+- Existing non-empty `reports/prioritization-matrix.csv` is preserved.
 - Prevents accidental loss of curated prioritization artifacts during reruns.
 
 ## [1.1.1] - 2026-02-28
