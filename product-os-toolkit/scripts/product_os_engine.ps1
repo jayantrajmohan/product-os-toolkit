@@ -835,7 +835,11 @@ function Build-Insights {
 
 function Build-Prioritization {
   $rows = Get-ScopedRows -Rows (Import-Csv -Path $Registry)
-  if ($rows.Count -eq 0) { @() | Export-Csv -Path $Prioritization -NoTypeInformation -Encoding ascii; return }
+  if ($rows.Count -eq 0) {
+    @() | Export-Csv -Path $Prioritization -NoTypeInformation -Encoding ascii
+    @() | Export-Csv -Path $PrioritizationPM -NoTypeInformation -Encoding ascii
+    return
+  }
   if ($InitiativeKey -eq "global") {
     $groups = $rows | Group-Object -Property { "$($_.initiative_id)::$(if ([string]::IsNullOrWhiteSpace($_.theme)) { "unlabeled" } else { $_.theme })" } | Sort-Object Count -Descending | Select-Object -First 20
   } else {

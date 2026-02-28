@@ -2,6 +2,16 @@
 
 All notable changes to Product OS Toolkit are documented in this file.
 
+## [1.1.1] - 2026-02-28
+
+Prioritization artifact consistency patch.
+
+### Fixed
+- `runstage prioritization` now always writes both:
+  - `reports/prioritization.csv` (compat alias)
+  - `reports/prioritization-matrix.csv` (PM-friendly canonical)
+- This applies even when prioritization has zero scoped rows.
+
 ## [1.1.0] - 2026-02-28
 
 Intake and initiative-start reliability update.
