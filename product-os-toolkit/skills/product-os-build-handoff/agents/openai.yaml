@@ -1,0 +1,6 @@
+version: 1
+interface:
+  display_name: Product OS Build Handoff
+  short_description: Transform definition artifacts into build-ready handoff with traceable test mapping.
+  default_prompt: Run Product OS build handoff and prepare delivery-ready artifacts and agent packs for implementation.
+

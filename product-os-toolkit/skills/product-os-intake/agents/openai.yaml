@@ -1,0 +1,6 @@
+version: 1
+interface:
+  display_name: Product OS Intake
+  short_description: Normalize raw PM feedback into traceable signals and initiative candidates.
+  default_prompt: Run Product OS intake on new raw inputs and update normalized registry and portfolio signals.
+

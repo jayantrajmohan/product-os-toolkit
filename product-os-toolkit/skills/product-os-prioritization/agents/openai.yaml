@@ -1,0 +1,6 @@
+version: 1
+interface:
+  display_name: Product OS Prioritization
+  short_description: Rank initiatives with documented scoring, rationale, and sequencing.
+  default_prompt: Run Product OS prioritization and produce aligned portfolio and initiative prioritization artifacts.
+

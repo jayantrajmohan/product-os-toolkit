@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: Product OS Daily Ops
+  short_description: Daily plan, session control, and end-of-day context consolidation.
+  default_prompt: Run Product OS daily operations and keep initiative context files updated.

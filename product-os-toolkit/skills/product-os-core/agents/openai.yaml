@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: Product OS Core
+  short_description: Stage-based AI PM workflow for discovery to learning with approvals.
+  default_prompt: Run Product OS for this initiative stage and produce contract-compliant artifacts.
