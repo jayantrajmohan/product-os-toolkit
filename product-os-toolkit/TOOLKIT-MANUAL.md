@@ -1,6 +1,6 @@
 # Product OS Toolkit Manual
 
-Version: `1.2.0` (see `VERSION` and `CHANGELOG.md`).
+Version: `1.2.1` (see `VERSION` and `CHANGELOG.md`).
 
 ## 1. Purpose
 
@@ -288,4 +288,5 @@ Notes:
 
 1. `README.md`
 1. this file (`TOOLKIT-MANUAL.md`)
+1. `COMMANDS-CHEATSHEET.md`
 1. `specs/*`

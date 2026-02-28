@@ -2,6 +2,20 @@
 
 All notable changes to Product OS Toolkit are documented in this file.
 
+## [1.2.2] - 2026-02-28
+
+Operator guidance improvement.
+
+### Added
+- Toolkit-level universal command guide:
+  - `COMMANDS-CHEATSHEET.md`
+- Added cheatsheet references from:
+  - `README.md`
+  - `TOOLKIT-MANUAL.md`
+
+### Changed
+- Synced README and manual version labels with toolkit `VERSION`.
+
 ## [1.2.1] - 2026-02-28
 
 Reports navigation usability patch.
