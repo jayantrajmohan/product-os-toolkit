@@ -15,7 +15,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$EngineVersion = "2.1.0"
+$EngineVersion = "2.2.0"
 
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   throw "RepoRoot is required. Use generated wrappers (scripts/product_os.cmd or scripts/product_os.sh) or pass -RepoRoot explicitly."
@@ -52,22 +52,22 @@ $InitiativePacks = Join-Path $InitiativeDir "agent-packs"
 $InitiativeLogs = Join-Path $InitiativeDir "logs"
 $InitiativeContext = Join-Path $InitiativeDir "context"
 
-$Insights = Join-Path $InitiativeReports "insights-summary.md"
-$InsightsPM = Join-Path $InitiativeReports "discovery-insights.md"
+$Insights = Join-Path $InitiativeReports "discovery-insights.md"
+$InsightsPM = $Insights
 $DiscoveryBrief = Join-Path $InitiativeReports "discovery-brief.md"
-$Prioritization = Join-Path $InitiativeReports "prioritization.csv"
-$PrioritizationPM = Join-Path $InitiativeReports "prioritization-matrix.csv"
-$Roadmap = Join-Path $InitiativeReports "roadmap-proposal.md"
-$RoadmapPM = Join-Path $InitiativeReports "roadmap-plan.md"
+$Prioritization = Join-Path $InitiativeReports "prioritization-matrix.csv"
+$PrioritizationPM = $Prioritization
+$Roadmap = Join-Path $InitiativeReports "roadmap-plan.md"
+$RoadmapPM = $Roadmap
 $PrioritizationDecisionLog = Join-Path $InitiativeReports "prioritization-decision-log.md"
-$DefinePRD = Join-Path $InitiativeReports "prd.md"
-$DefinePRDPM = Join-Path $InitiativeReports "requirements-prd.md"
+$DefinePRD = Join-Path $InitiativeReports "requirements-prd.md"
+$DefinePRDPM = $DefinePRD
 $ExecutionPlan = Join-Path $InitiativeReports "execution-plan.md"
-$BuildReadiness = Join-Path $InitiativeReports "build-readiness.md"
-$BuildReadinessPM = Join-Path $InitiativeReports "delivery-readiness.md"
+$BuildReadiness = Join-Path $InitiativeReports "delivery-readiness.md"
+$BuildReadinessPM = $BuildReadiness
 $TestCaseMapping = Join-Path $InitiativeReports "test-case-mapping.md"
-$ReleaseCard = Join-Path $InitiativeReports "release-readiness.md"
-$ReleaseCardPM = Join-Path $InitiativeReports "launch-readiness.md"
+$ReleaseCard = Join-Path $InitiativeReports "launch-readiness.md"
+$ReleaseCardPM = $ReleaseCard
 $ReleaseChecklist = Join-Path $InitiativeReports "release-checklist.md"
 $LearningReview = Join-Path $InitiativeReports "learning-review.md"
 $IterationBacklog = Join-Path $InitiativeReports "iteration-backlog.md"
@@ -325,7 +325,7 @@ function Build-DayPlan {
     $next = Get-NextStageLabel -InitId $id
     $meta = Get-InitiativeMetaById -InitId $id
     $score = 0.0
-    $p = Join-Path $d.FullName "reports/prioritization.csv"
+    $p = Join-Path $d.FullName "reports/prioritization-matrix.csv"
     if (Test-Path $p) {
       $rows = Import-Csv -Path $p
       if ($rows.Count -gt 0) {

@@ -2,6 +2,21 @@
 
 All notable changes to Product OS Toolkit are documented in this file.
 
+## [1.2.0] - 2026-02-28
+
+Canonical single-artifact mode by stage.
+
+### Changed
+- Toolkit now writes and validates one canonical report file per artifact type.
+- Legacy alias outputs are no longer generated during stage runs.
+
+### Canonical files enforced
+- Discovery: `discovery-insights.md`, `discovery-brief.md`
+- Prioritization: `prioritization-matrix.csv`, `roadmap-plan.md`, `prioritization-decision-log.md`
+- Definition: `requirements-prd.md`, `execution-plan.md`
+- Delivery readiness: `delivery-readiness.md`, `test-case-mapping.md`
+- Launch readiness: `launch-readiness.md`, `release-checklist.md`
+
 ## [1.1.2] - 2026-02-28
 
 Prioritization data preservation patch.

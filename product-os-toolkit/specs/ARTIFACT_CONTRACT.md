@@ -16,7 +16,7 @@ Required stage outputs:
 
 1. `discover`
 - Initiative-scoped:
-  - `reports/discovery-insights.md` (compat alias: `insights-summary.md`)
+  - `reports/discovery-insights.md`
   - `reports/discovery-brief.md`
 - Workspace-scoped:
   - `normalized/feedback_registry.csv`
@@ -24,24 +24,24 @@ Required stage outputs:
   - Registry triage states must use: `Mapped`, `Candidate`, `Duplicate`, `Ignored`, `Promoted`.
 
 1. `prioritize`
-- `reports/prioritization-matrix.csv` (compat alias: `prioritization.csv`)
-- `reports/roadmap-plan.md` (compat alias: `roadmap-proposal.md`)
+- `reports/prioritization-matrix.csv`
+- `reports/roadmap-plan.md`
 - `reports/prioritization-decision-log.md`
 
 1. `define`
-- `reports/requirements-prd.md` (compat alias: `prd.md`)
-  - `reports/execution-plan.md`
-  - Must include: `Problem Statement`, `Success Metrics`, `Requirements`, `Out Of Scope`.
+- `reports/requirements-prd.md`
+- `reports/execution-plan.md`
+- Must include: `Problem Statement`, `Success Metrics`, `Requirements`, `Out Of Scope`.
 
 1. `build_ready`
-- `reports/delivery-readiness.md` with `Status: Ready` before approval (compat alias: `build-readiness.md`)
-  - `reports/test-case-mapping.md`
-  - Must include: `Acceptance Criteria`, `Test Plan`, `Dependencies`, `Risks And Mitigations`.
+- `reports/delivery-readiness.md` with `Status: Ready` before approval
+- `reports/test-case-mapping.md`
+- Must include: `Acceptance Criteria`, `Test Plan`, `Dependencies`, `Risks And Mitigations`.
 
 1. `release_ready`
-- `reports/launch-readiness.md` (compat alias: `release-readiness.md`)
-  - `reports/release-checklist.md`
-  - Must include: `Rollout Plan`, `Monitoring And Alerts`, `Rollback Plan`, `Go/No-Go Checklist`.
+- `reports/launch-readiness.md`
+- `reports/release-checklist.md`
+- Must include: `Rollout Plan`, `Monitoring And Alerts`, `Rollback Plan`, `Go/No-Go Checklist`.
 
 1. `learn_ready`
 - `reports/learning-review.md`

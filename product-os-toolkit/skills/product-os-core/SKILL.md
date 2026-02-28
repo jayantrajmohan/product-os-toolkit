@@ -15,7 +15,7 @@ Execute this stage workflow:
 1. `runstage definition` (alias: `define`).
 1. Human review, then `approvestage definition`.
 1. `runstage delivery_ready` (alias: `build_ready`).
-1. Ensure `build-readiness.md` and `delivery-readiness.md` have `Status: Ready`, then `approvestage delivery_ready`.
+1. Ensure `delivery-readiness.md` has `Status: Ready`, then `approvestage delivery_ready`.
 1. `runstage launch_ready` (alias: `release_ready`), then `approvestage launch_ready`.
 1. `runstage learning` (alias: `learn_ready`), then `approvestage learning`.
 

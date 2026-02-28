@@ -1,6 +1,6 @@
 # Product OS Toolkit Manual
 
-Version: `1.1.0` (see `VERSION` and `CHANGELOG.md`).
+Version: `1.2.0` (see `VERSION` and `CHANGELOG.md`).
 
 ## 1. Purpose
 
@@ -136,6 +136,10 @@ Reports:
 - `reports/release-checklist.md`
 - `reports/learning-review.md`
 - `reports/iteration-backlog.md`
+
+Naming policy:
+- Product OS uses one canonical file per artifact type.
+- Duplicate alias report files are not generated.
 
 Context:
 

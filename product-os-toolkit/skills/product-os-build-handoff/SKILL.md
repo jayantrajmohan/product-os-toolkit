@@ -22,7 +22,6 @@ Delivery readiness artifacts to validate/update:
 
 - `product-intel/initiatives/<initiative_id>/reports/delivery-readiness.md`
 - `product-intel/initiatives/<initiative_id>/reports/test-case-mapping.md`
-- `product-intel/initiatives/<initiative_id>/reports/build-readiness.md` (compat alias)
 
 Agent handoff artifacts:
 
@@ -35,4 +34,3 @@ Rules:
 - `delivery_ready` approval requires `Status: Ready` in readiness docs.
 - Capture unresolved decisions and dependency risks before handoff.
 - Keep scope explicit (`In Scope`, `Out Of Scope`) to prevent build drift.
-

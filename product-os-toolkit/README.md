@@ -4,7 +4,7 @@ Portable Product OS for AI-enabled PMs using Codex, Claude Code, or generic LLM 
 
 Read [TOOLKIT-MANUAL.md](./TOOLKIT-MANUAL.md) for full end-to-end documentation.
 For session-by-session operation, use the "Session Run Playbook" section in the manual.
-Current version: `1.1.0` (see [VERSION](./VERSION) and [CHANGELOG.md](./CHANGELOG.md)).
+Current version: `1.2.0` (see [VERSION](./VERSION) and [CHANGELOG.md](./CHANGELOG.md)).
 
 ## Included
 - `scripts/product_os_engine.ps1`: stage orchestrator, approvals, validation, agent-pack generation.
@@ -74,3 +74,6 @@ Note: direct engine execution requires `-RepoRoot`; wrappers pass this automatic
 
 ## Compatibility
 Provider-specific prompting is separated from artifact contracts so output structure is identical across Codex, Claude Code, and generic agents.
+
+Artifact naming policy:
+- One canonical file per artifact type (no duplicate alias files).

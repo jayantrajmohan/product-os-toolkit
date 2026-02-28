@@ -25,7 +25,6 @@ Stage-specific required files:
 
 1. delivery_ready
 - `reports/delivery-readiness.md`
-- `reports/build-readiness.md` (`Status: Ready`)
 - `reports/test-case-mapping.md`
 
 1. launch_ready
